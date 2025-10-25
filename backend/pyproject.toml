@@ -1,0 +1,15 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Python FastAPI and sqlalchemy backend"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.120.0",
+    "lsprotocol>=2025.0.0",
+    "pydantic>=2.12.3",
+    "ruff>=0.14.2",
+    "ruff-lsp>=0.0.62",
+    "sqlalchemy>=2.0.44",
+    "uvicorn[standard]>=0.38.0",
+]
