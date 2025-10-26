@@ -1,62 +1,66 @@
 import datetime
+from typing import Optional, List
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, String, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy.orm import relationship, mapped_column, Mapped
 from db import Base
 
 
 class Category(Base):
     __tablename__ = "categories"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, index=True)
 
-    menu_items = relationship(
-        "MenuItem", back_populates="category", cascade="all, delete-orphan"
+    menu_items: Mapped[List["MenuItem"]] = relationship(
+        back_populates="category", cascade="all, delete-orphan"
     )
 
 
 class MenuItem(Base):
     __tablename__ = "menu_items"
-    id = Column(Integer, primary_key=True, index=True)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    description = Column(String, nullable=True)
-    price = Column(Float, nullable=False, default=0.0)
-    tags = Column(String, nullable=True)
-    active = Column(Boolean, nullable=False, default=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"))
+    description: Mapped[Optional[str]] = mapped_column(String)
+    price: Mapped[float] = mapped_column(Float, default=0.0)
+    tags: Mapped[Optional[str]] = mapped_column(String)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    modifiers = relationship(
-        "Modifier", back_populates="item", cascade="all, delete-orphan"
+    modifiers: Mapped[List["Modifier"]] = relationship(
+        back_populates="item", cascade="all, delete-orphan"
     )
-    category = relationship("Category", back_populates="menu_items")
+    category: Mapped["Category"] = relationship(back_populates="menu_items")
 
 
 class Modifier(Base):
     __tablename__ = "modifiers"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    price_change = Column(Float, nullable=False, default=0.0)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    price_change: Mapped[float] = mapped_column(Float, default=0.0)
 
-    item_id = Column(Integer, ForeignKey("menu_items.id"), nullable=False)
-    item = relationship("MenuItem", back_populates="modifiers")
+    item_id: Mapped[int] = mapped_column(Integer, ForeignKey("menu_items.id"))
+    item: Mapped["MenuItem"] = relationship(back_populates="modifiers")
 
 
 class Order(Base):
     __tablename__ = "orders"
-    id = Column(Integer, primary_key=True, index=True)
-    status = Column(String, default="pending")
-    timestamp = Column(DateTime, default=datetime.UTC)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    status: Mapped[str] = mapped_column(String, default="pending")
+    timestamp: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
+    )
 
-    items = relationship(
-        "OrderItem", back_populates="order", cascade="all, delete-orphan"
+    items: Mapped[List["OrderItem"]] = relationship(
+        back_populates="order", cascade="all, delete-orphan"
     )
 
 
 class OrderItem(Base):
     __tablename__ = "order_items"
-    id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
-    item_id = Column(Integer, ForeignKey("menu_items.id"), nullable=False)
-    modifiers = Column(String, nullable=True)
-    quantity = Column(Integer, default=1)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    order_id: Mapped[int] = mapped_column(Integer, ForeignKey("orders.id"))
+    item_id: Mapped[int] = mapped_column(Integer, ForeignKey("menu_items.id"))
+    modifiers: Mapped[Optional[str]] = mapped_column(String)
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
 
-    order = relationship("Order", back_populates="items")
+    order: Mapped["Order"] = relationship(back_populates="items")
