@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, List
-from sqlalchemy import Integer, String, ForeignKey, Float, Boolean
+from sqlalchemy import Integer, String, ForeignKey, Float, Boolean, JSON, Text
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from backend.src.db import Base
 
@@ -9,7 +9,7 @@ from backend.src.db import Base
 class Category(Base):
     __tablename__ = "categories"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, init=False)
-    name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, index=True)
 
     menu_items: Mapped[List["MenuItem"]] = relationship(
         back_populates="category", cascade="all, delete-orphan", init=False
@@ -19,10 +19,10 @@ class Category(Base):
 class MenuItem(Base):
     __tablename__ = "menu_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, init=False)
-    name: Mapped[str] = mapped_column(String, index=True)
+    name: Mapped[str] = mapped_column(String(50), index=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"))
-    description: Mapped[Optional[str]] = mapped_column(String)
-    tags: Mapped[Optional[List[str]]] = mapped_column(String)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    tags: Mapped[Optional[List[str]]] = mapped_column(JSON, default_factory=list)
 
     modifiers: Mapped[List["Modifier"]] = relationship(
         back_populates="item", cascade="all, delete-orphan", init=False
@@ -36,7 +36,7 @@ class MenuItem(Base):
 class Modifier(Base):
     __tablename__ = "modifiers"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, init=False)
-    name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     item_id: Mapped[int] = mapped_column(Integer, ForeignKey("menu_items.id"))
 
     item: Mapped["MenuItem"] = relationship(back_populates="modifiers")
@@ -50,7 +50,7 @@ class Order(Base):
     items: Mapped[List["OrderItem"]] = relationship(
         back_populates="order", cascade="all, delete-orphan"
     )
-    status: Mapped[str] = mapped_column(String, default="pending")
+    status: Mapped[str] = mapped_column(String(50), default="pending")
     # timestamp: Mapped[DateTime] = mapped_column(
     #     DateTime(timezone=True),
     #     default=lambda: datetime.datetime.now(datetime.timezone.utc),
@@ -62,7 +62,7 @@ class OrderItem(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, init=False)
     order_id: Mapped[int] = mapped_column(Integer, ForeignKey("orders.id"))
     item_id: Mapped[int] = mapped_column(Integer, ForeignKey("menu_items.id"))
-    modifiers: Mapped[Optional[str]] = mapped_column(String)
+    modifiers: Mapped[Optional[str]] = mapped_column(String(50))
 
     order: Mapped["Order"] = relationship(back_populates="items", init=False)
     quantity: Mapped[int] = mapped_column(Integer, default=1)
