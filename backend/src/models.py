@@ -22,7 +22,7 @@ class MenuItem(Base):
     name: Mapped[str] = mapped_column(String, index=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"))
     description: Mapped[Optional[str]] = mapped_column(String)
-    tags: Mapped[Optional[str]] = mapped_column(String)
+    tags: Mapped[Optional[List[str]]] = mapped_column(String)
 
     modifiers: Mapped[List["Modifier"]] = relationship(
         back_populates="item", cascade="all, delete-orphan", init=False
