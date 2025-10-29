@@ -6,11 +6,9 @@ from sqlalchemy.orm import (
 )
 
 # SQLite file in the backend folder
-DATABASE_URL = "sqlite:///./beanthere.db"
+DATABASE_URL = "postgresql+psycopg2://bean:coffee@localhost:5432/beanthere_pos"
 
-engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}, echo=False
-)
+engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
