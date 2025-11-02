@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 from typing import Optional, List
-from sqlalchemy import Integer, String, ForeignKey, Float, Boolean, JSON, Text
+from sqlalchemy import (
+    Integer,
+    String,
+    ForeignKey,
+    Float,
+    Boolean,
+    JSON,
+    Text,
+    Table,
+    Column,
+)
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from backend.src.db import Base
 
@@ -12,8 +22,16 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(50), unique=True, index=True)
 
     menu_items: Mapped[List["MenuItem"]] = relationship(
-        back_populates="category", cascade="all, delete-orphan", init=False
+        "MenuItem", back_populates="category", cascade="all, delete-orphan", init=False
     )
+
+
+menu_item_modifiers = Table(
+    "menu_item_modifiers",
+    Base.metadata,
+    Column("menu_item_id", ForeignKey("menu_items.id"), primary_key=True),
+    Column("modifier_id", ForeignKey("modifiers.id"), primary_key=True),
+)
 
 
 class MenuItem(Base):
@@ -22,24 +40,30 @@ class MenuItem(Base):
     name: Mapped[str] = mapped_column(String(50), index=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"))
     description: Mapped[Optional[str]] = mapped_column(Text)
-    tags: Mapped[Optional[List[str]]] = mapped_column(JSON, default_factory=list)
 
-    modifiers: Mapped[List["Modifier"]] = relationship(
-        back_populates="item", cascade="all, delete-orphan", init=False
+    modifiers: Mapped[Optional[List["Modifier"]]] = relationship(
+        back_populates="menu_items", secondary=menu_item_modifiers, default_factory=list
     )
-    category: Mapped["Category"] = relationship(back_populates="menu_items", init=False)
+    category: Mapped["Category"] = relationship(
+        "Category", back_populates="menu_items", init=False
+    )
 
     price: Mapped[float] = mapped_column(Float, default=0.0)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    tags: Mapped[Optional[List[str]]] = mapped_column(JSON, default_factory=list)
 
 
 class Modifier(Base):
     __tablename__ = "modifiers"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, init=False)
     name: Mapped[str] = mapped_column(String(50), unique=True, index=True)
-    item_id: Mapped[int] = mapped_column(Integer, ForeignKey("menu_items.id"))
 
-    item: Mapped["MenuItem"] = relationship(back_populates="modifiers")
+    menu_items: Mapped[List["MenuItem"]] = relationship(
+        "MenuItem",
+        back_populates="modifiers",
+        secondary=menu_item_modifiers,
+        default_factory=list,
+    )
     price_change: Mapped[float] = mapped_column(Float, default=0.0)
 
 
