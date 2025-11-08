@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from typing import Optional, List
 from sqlalchemy import (
     Integer,
@@ -11,6 +13,7 @@ from sqlalchemy import (
     Text,
     Table,
     Column,
+    DateTime,
 )
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from backend.src.db import Base
@@ -75,10 +78,9 @@ class Order(Base):
         back_populates="order", cascade="all, delete-orphan"
     )
     status: Mapped[str] = mapped_column(String(50), default="pending")
-    # timestamp: Mapped[DateTime] = mapped_column(
-    #     DateTime(timezone=True),
-    #     default=lambda: datetime.datetime.now(datetime.timezone.utc),
-    # )
+    timestamp: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), default_factory=lambda: datetime.now(timezone.utc)
+    )
 
 
 class OrderItem(Base):
