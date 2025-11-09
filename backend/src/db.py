@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import (
     sessionmaker,
-    MappedAsDataclass,
     DeclarativeBase,
 )
 
@@ -12,5 +11,5 @@ engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-class Base(MappedAsDataclass, DeclarativeBase):
+class Base(DeclarativeBase):
     pass
