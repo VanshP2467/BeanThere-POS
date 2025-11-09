@@ -3,6 +3,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
+
 # Categories
 
 
@@ -44,11 +45,17 @@ class ModifierRead(ModifierSchema):
 
 
 class MenuItemSchema(BaseModel):
+    id: Optional[int]
     name: str
-    description: Optional[str] = None
+    description: Optional[str]
     price: float
-    active: bool = True
     tags: Optional[List[str]] = []
+    active: bool = True
+    modifiers: Optional[List[int]] = []
+    category_id: Optional[int]
+
+    class Config:
+        from_attributes = True
 
 
 class MenuItemCreate(MenuItemSchema):
