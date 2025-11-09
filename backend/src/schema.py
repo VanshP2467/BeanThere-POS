@@ -72,6 +72,14 @@ class MenuItemRead(MenuItemSchema):
         from_attributes = True
 
 
+class MenuItemUpdate(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
+    price: Optional[float]
+    active: Optional[bool]
+    tags: Optional[List[str]]
+
+
 class OrderItemSchema(BaseModel):
     item_id: int
     quantity: int = 1
