@@ -11,7 +11,7 @@ def get_menu_items(db: Session):
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}",
+            detail=f"Database error: {e.__class__.__name__}: {str(e)}",
         )
 
 
@@ -42,23 +42,32 @@ def create_menu_item(db: Session, item: schema.MenuItemCreate):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}",
+            detail=f"Database error: {e.__class__.__name__}: {str(e)}",
         )
 
 
 def update_menu_item(db: Session, item_id: int, updated_item: schema.MenuItemUpdate):
     db_item = get_menu_item(db, item_id)
-    for key, value in updated_item.model_dump(exclude_unset=True).items():
+
+    update_data = updated_item.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
         setattr(db_item, key, value)
+
     try:
         db.commit()
         db.refresh(db_item)
         return db_item
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Duplicate or invalid data while updating menu item {item_id}.",
+        )
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update menu item: {str(e)}",
+            detail=f"Failed to update menu item: {e.__class__.__name__}: {str(e)}",
         )
 
 
@@ -72,5 +81,5 @@ def delete_menu_item(db: Session, item_id: int):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete menu item: {str(e)}",
+            detail=f"Failed to delete menu item: {e.__class__.__name__}: {str(e)}",
         )
