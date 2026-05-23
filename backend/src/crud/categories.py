@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from backend.src.models import Category
-from backend.src.schema import CategorySchema
+from backend.src.schema import CategoryCreate, CategoryUpdate
 
 
 def get_categories(db: Session):
@@ -26,7 +26,7 @@ def get_category(category_id: int, db: Session):
     return category
 
 
-def create_category(category: CategorySchema, db: Session):
+def create_category(category: CategoryCreate, db: Session):
     db_category = Category(name=category.name)
     try:
         db.add(db_category)
@@ -47,15 +47,14 @@ def create_category(category: CategorySchema, db: Session):
         )
 
 
-def update_category(category_id: int, category: CategorySchema, db: Session):
-    db_category = db.query(Category).filter(Category.id == category_id).first()
-    if not db_category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Category with ID {category_id} not found",
-        )
+def update_category(category_id: int, category: CategoryUpdate, db: Session):
+    db_category = get_category(category_id, db)
+    update_data = category.model_dump(exclude_unset=True)
+    if not update_data:
+        return db_category
 
-    db_category.name = category.name
+    for key, value in update_data.items():
+        setattr(db_category, key, value)
     try:
         db.commit()
         db.refresh(db_category)

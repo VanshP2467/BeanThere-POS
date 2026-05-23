@@ -11,13 +11,13 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[schema.MenuItemSchema])
+@router.get("/", response_model=List[schema.MenuItemRead])
 def list_menu_items(db: Session = Depends(get_db)):
     """Retrieve all menu items"""
     return crud.menu_items.get_menu_items(db)
 
 
-@router.get("/{item_id}", response_model=schema.MenuItemSchema)
+@router.get("/{item_id}", response_model=schema.MenuItemRead)
 def get_menu_item(item_id: int, db: Session = Depends(get_db)):
     """Retrieve a single menu item by ID"""
     return crud.menu_items.get_menu_item(db, item_id)
@@ -25,7 +25,7 @@ def get_menu_item(item_id: int, db: Session = Depends(get_db)):
 
 @router.post(
     "/",
-    response_model=schema.MenuItemSchema,
+    response_model=schema.MenuItemRead,
     status_code=status.HTTP_201_CREATED,
 )
 def create_menu_item(item: schema.MenuItemCreate, db: Session = Depends(get_db)):
@@ -33,7 +33,7 @@ def create_menu_item(item: schema.MenuItemCreate, db: Session = Depends(get_db))
     return crud.menu_items.create_menu_item(db, item)
 
 
-@router.put("/{item_id}", response_model=schema.MenuItemSchema)
+@router.put("/{item_id}", response_model=schema.MenuItemRead)
 def update_menu_item(
     item_id: int, item: schema.MenuItemUpdate, db: Session = Depends(get_db)
 ):
