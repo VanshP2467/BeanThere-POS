@@ -1,9 +1,13 @@
+import logging
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from backend.src import models, schema
 from backend.src.crud.categories import get_category
+
+logger = logging.getLogger(__name__)
 
 
 def _get_modifiers(
@@ -30,9 +34,10 @@ def get_menu_items(db: Session):
     try:
         return db.query(models.MenuItem).all()
     except SQLAlchemyError as exc:
+        logger.exception("Failed to fetch menu items", exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {exc.__class__.__name__}: {exc}",
+            detail="Failed to fetch menu items.",
         )
 
 
@@ -70,9 +75,10 @@ def create_menu_item(db: Session, item: schema.MenuItemCreate):
         )
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to create menu item", exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {exc.__class__.__name__}: {exc}",
+            detail="Failed to create menu item.",
         )
 
 
@@ -103,9 +109,10 @@ def update_menu_item(db: Session, item_id: int, updated_item: schema.MenuItemUpd
         )
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to update menu item %s", item_id, exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update menu item: {exc.__class__.__name__}: {exc}",
+            detail="Failed to update menu item.",
         )
 
 
@@ -117,7 +124,8 @@ def delete_menu_item(db: Session, item_id: int):
         return {"message": f"Menu item {item_id} deleted successfully."}
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to delete menu item %s", item_id, exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete menu item: {exc.__class__.__name__}: {exc}",
+            detail="Failed to delete menu item.",
         )

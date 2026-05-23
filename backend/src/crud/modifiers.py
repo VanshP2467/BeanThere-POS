@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -5,14 +7,17 @@ from sqlalchemy.orm import Session
 from backend.src.models import Modifier
 from backend.src.schema import ModifierCreate, ModifierUpdate
 
+logger = logging.getLogger(__name__)
+
 
 def get_modifiers(db: Session):
     try:
         return db.query(Modifier).all()
     except SQLAlchemyError as exc:
+        logger.exception("Failed to fetch modifiers", exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {exc.__class__.__name__}: {exc}",
+            detail="Failed to fetch modifiers.",
         )
 
 
@@ -41,9 +46,10 @@ def create_modifier(modifier: ModifierCreate, db: Session):
         )
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to create modifier", exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create modifier: {exc.__class__.__name__}: {exc}",
+            detail="Failed to create modifier.",
         )
 
 
@@ -68,9 +74,10 @@ def update_modifier(modifier_id: int, modifier: ModifierUpdate, db: Session):
         )
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to update modifier %s", modifier_id, exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update modifier: {exc.__class__.__name__}: {exc}",
+            detail="Failed to update modifier.",
         )
 
 
@@ -82,7 +89,8 @@ def delete_modifier(modifier_id: int, db: Session):
         return {"message": f"Modifier '{db_modifier.name}' deleted successfully"}
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to delete modifier %s", modifier_id, exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete modifier: {exc.__class__.__name__}: {exc}",
+            detail="Failed to delete modifier.",
         )

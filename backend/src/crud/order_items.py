@@ -1,9 +1,13 @@
+import logging
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from backend.src import models, schema
 from backend.src.crud.helpers import get_menu_item_or_404, get_order_or_404
+
+logger = logging.getLogger(__name__)
 
 
 def get_order_items(order_id: int | None, db: Session):
@@ -13,9 +17,10 @@ def get_order_items(order_id: int | None, db: Session):
             query = query.filter(models.OrderItem.order_id == order_id)
         return query.all()
     except SQLAlchemyError as exc:
+        logger.exception("Failed to fetch order items", exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {exc.__class__.__name__}: {exc}",
+            detail="Failed to fetch order items.",
         )
 
 
@@ -49,9 +54,10 @@ def create_order_item(db: Session, item: schema.OrderItemStandaloneCreate):
         return db_item
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to create order item", exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create order item: {exc.__class__.__name__}: {exc}",
+            detail="Failed to create order item.",
         )
 
 
@@ -75,9 +81,10 @@ def update_order_item(
         return db_item
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to update order item %s", order_item_id, exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update order item: {exc.__class__.__name__}: {exc}",
+            detail="Failed to update order item.",
         )
 
 
@@ -89,7 +96,8 @@ def delete_order_item(order_item_id: int, db: Session):
         return {"message": f"Order item {order_item_id} deleted successfully."}
     except SQLAlchemyError as exc:
         db.rollback()
+        logger.exception("Failed to delete order item %s", order_item_id, exc_info=exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete order item: {exc.__class__.__name__}: {exc}",
+            detail="Failed to delete order item.",
         )
