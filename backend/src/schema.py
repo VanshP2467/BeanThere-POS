@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -55,14 +55,14 @@ class MenuItemBase(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    tags: List[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
     active: bool = True
     category_id: Optional[int] = None
 
 
 class MenuItemCreate(MenuItemBase):
     category_id: int
-    modifier_ids: List[int] = Field(default_factory=list)
+    modifier_ids: list[int] = Field(default_factory=list)
 
 
 class MenuItemUpdate(BaseModel):
@@ -70,16 +70,16 @@ class MenuItemUpdate(BaseModel):
     description: Optional[str] = None
     price: Optional[float] = None
     active: Optional[bool] = None
-    tags: Optional[List[str]] = None
+    tags: Optional[list[str]] = None
     category_id: Optional[int] = None
-    modifier_ids: Optional[List[int]] = None
+    modifier_ids: Optional[list[int]] = None
 
 
 class MenuItemRead(MenuItemBase):
     id: int
     category_id: Optional[int] = None
     category: Optional[CategoryRead] = None
-    modifiers: List[ModifierRead] = Field(default_factory=list)
+    modifiers: list[ModifierRead] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -122,7 +122,7 @@ class OrderBase(BaseModel):
 
 
 class OrderCreate(OrderBase):
-    items: List[OrderItemCreate] = Field(default_factory=list)
+    items: list[OrderItemCreate] = Field(default_factory=list)
 
 
 class OrderUpdate(BaseModel):
@@ -132,6 +132,6 @@ class OrderUpdate(BaseModel):
 class OrderRead(OrderBase):
     id: int
     timestamp: datetime
-    items: List[OrderItemRead] = Field(default_factory=list)
+    items: list[OrderItemRead] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
