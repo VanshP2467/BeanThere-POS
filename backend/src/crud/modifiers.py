@@ -64,7 +64,7 @@ def update_modifier(modifier_id: int, modifier: ModifierUpdate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Modifier '{modifier_id}' update conflicts with existing data",
+            detail=f"Modifier '{db_modifier.name}' update conflicts with existing data",
         )
     except SQLAlchemyError as exc:
         db.rollback()

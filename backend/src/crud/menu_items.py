@@ -86,10 +86,11 @@ def create_menu_item(db: Session, item: schema.MenuItemCreate):
 def update_menu_item(db: Session, item_id: int, updated_item: schema.MenuItemUpdate):
     db_item = get_menu_item(db, item_id)
     update_data = updated_item.model_dump(exclude_unset=True)
-    modifier_ids = update_data.pop("modifier_ids", None)
 
     if "category_id" in update_data and update_data["category_id"] is not None:
         _get_category(db, update_data["category_id"])
+
+    modifier_ids = update_data.pop("modifier_ids", None)
 
     for key, value in update_data.items():
         setattr(db_item, key, value)
