@@ -176,7 +176,8 @@ orderItems = {
 cartOpen = true;
 }
 
-function updateQuantity(itemId: number, delta: number) {
+function updateQuantity(itemId: number | undefined, delta: number) {
+if (typeof itemId !== "number") return;
 const existing = orderItems[itemId];
 if (!existing) return;
 const nextQuantity = existing.quantity + delta;
@@ -392,7 +393,7 @@ No items added yet. Select a menu item to start an order.
 <Button
 size="icon-sm"
 variant="outline"
-onclick={() => updateQuantity(entry.item.id ?? 0, -1)}
+onclick={() => updateQuantity(entry.item.id, -1)}
 >
 <MinusIcon class="size-3" />
 </Button>
@@ -402,7 +403,7 @@ onclick={() => updateQuantity(entry.item.id ?? 0, -1)}
 <Button
 size="icon-sm"
 variant="outline"
-onclick={() => updateQuantity(entry.item.id ?? 0, 1)}
+onclick={() => updateQuantity(entry.item.id, 1)}
 >
 <PlusIcon class="size-3" />
 </Button>
