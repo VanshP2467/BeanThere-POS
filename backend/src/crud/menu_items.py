@@ -3,16 +3,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from backend.src import models, schema
-
-
-def _get_category(db: Session, category_id: int) -> models.Category:
-    category = db.query(models.Category).filter(models.Category.id == category_id).first()
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Category with id {category_id} not found",
-        )
-    return category
+from backend.src.crud.categories import get_category as get_category_or_404
 
 
 def _get_modifiers(
@@ -56,7 +47,7 @@ def get_menu_item(db: Session, item_id: int):
 
 
 def create_menu_item(db: Session, item: schema.MenuItemCreate):
-    _get_category(db, item.category_id)
+    get_category_or_404(item.category_id, db)
     db_item = models.MenuItem(
         name=item.name,
         description=item.description,
@@ -90,7 +81,7 @@ def update_menu_item(db: Session, item_id: int, updated_item: schema.MenuItemUpd
     update_data = updated_item.model_dump(exclude_unset=True)
 
     if "category_id" in update_data and update_data["category_id"] is not None:
-        _get_category(db, update_data["category_id"])
+        get_category_or_404(update_data["category_id"], db)
 
     modifier_ids = update_data.pop("modifier_ids", None)
 

@@ -77,7 +77,7 @@ class MenuItemUpdate(BaseModel):
 
 class MenuItemRead(MenuItemBase):
     id: int
-    category_id: int
+    category_id: Optional[int] = None
     category: Optional[CategoryRead] = None
     modifiers: List[ModifierRead] = Field(default_factory=list)
 
