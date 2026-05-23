@@ -57,6 +57,7 @@ class MenuItemBase(BaseModel):
     price: float
     tags: List[str] = Field(default_factory=list)
     active: bool = True
+    category_id: Optional[int] = None
 
 
 class MenuItemCreate(MenuItemBase):

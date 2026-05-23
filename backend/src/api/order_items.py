@@ -18,7 +18,7 @@ router = APIRouter(
 def list_order_items(
     order_id: int | None = None, db: Session = Depends(get_db)
 ):
-    return crud_order_items.get_order_items(db, order_id)
+    return crud_order_items.get_order_items(order_id, db)
 
 
 @router.get("/{order_item_id}", response_model=OrderItemRead)

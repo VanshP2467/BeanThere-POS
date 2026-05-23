@@ -6,7 +6,7 @@ from backend.src import models, schema
 from backend.src.crud.helpers import get_menu_item_or_404, get_order_or_404
 
 
-def get_order_items(db: Session, order_id: int | None = None):
+def get_order_items(order_id: int | None, db: Session):
     try:
         query = db.query(models.OrderItem)
         if order_id is not None:
