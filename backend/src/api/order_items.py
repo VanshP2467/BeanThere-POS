@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
-
 from backend.src.db import get_db
 from backend.src.schema import (
     OrderItemRead,
@@ -16,9 +14,9 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[OrderItemRead])
+@router.get("/", response_model=list[OrderItemRead])
 def list_order_items(
-    order_id: Optional[int] = None, db: Session = Depends(get_db)
+    order_id: int | None = None, db: Session = Depends(get_db)
 ):
     return crud_order_items.get_order_items(db, order_id)
 

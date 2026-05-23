@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from typing import List
-
 from backend.src.db import get_db
 from backend.src import crud, schema
 
@@ -11,7 +9,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[schema.MenuItemRead])
+@router.get("/", response_model=list[schema.MenuItemRead])
 def list_menu_items(db: Session = Depends(get_db)):
     """Retrieve all menu items"""
     return crud.menu_items.get_menu_items(db)

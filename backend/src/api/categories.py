@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from typing import List
-
 from backend.src.db import get_db
 from backend.src.schema import CategoryCreate, CategoryRead, CategoryUpdate
 from backend.src.crud import categories as crud_categories
@@ -12,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[CategoryRead])
+@router.get("/", response_model=list[CategoryRead])
 def list_categories(db: Session = Depends(get_db)):
     return crud_categories.get_categories(db)
 

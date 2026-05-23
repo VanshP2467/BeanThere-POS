@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from typing import List
-
 from backend.src.db import get_db
 from backend.src.schema import OrderCreate, OrderRead, OrderUpdate
 from backend.src.crud import orders as crud_orders
@@ -12,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[OrderRead])
+@router.get("/", response_model=list[OrderRead])
 def list_orders(db: Session = Depends(get_db)):
     return crud_orders.get_orders(db)
 
