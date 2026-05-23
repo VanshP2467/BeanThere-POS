@@ -140,7 +140,7 @@ def create_menu_item(item: MenuItemBase, db: Session = Depends(get_db)):
         description=item.description,
         price=item.price,
         tags=item.tags,
-        category_id=item.category.id if item.category else None,
+        category_id=item.category_id if item.category_id else None,
     )
     db.add(db_item)
     db.commit()
@@ -157,8 +157,8 @@ def update_menu_item(item_id: int, item: MenuItemBase, db: Session = Depends(get
     db_item.description = item.description
     db_item.price = item.price
     db_item.tags = item.tags
-    if item.category:
-        db_item.category_id = item.category.id
+    if item.category_id:
+        db_item.category_id = item.category_id
     db.commit()
     db.refresh(db_item)
     return db_item
