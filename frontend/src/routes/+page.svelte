@@ -129,6 +129,7 @@ try {
 const data = await fetchJson<{ name?: string }>(`/categories/${id}`);
 return { id, name: typeof data.name === "string" ? data.name : `Category ${id}` };
 } catch (error) {
+console.warn("Failed to load category details", error);
 return { id, name: `Category ${id}` };
 }
 })
@@ -160,7 +161,10 @@ isLoading = false;
 }
 
 function addToOrder(item: MenuItem) {
-if (typeof item.id !== "number") return;
+if (typeof item.id !== "number") {
+	console.warn("Menu item missing id, cannot add to order", item);
+	return;
+}
 const existing = orderItems[item.id];
 if (existing) {
 orderItems = {
@@ -294,7 +298,7 @@ Try again
 </div>
 {/each}
 {:else}
-{#each filteredItems as item (item.id ?? item.name)}
+{#each filteredItems as item, index (item.id ?? `${item.name}-${index}`)}
 <div class="flex h-full flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm">
 <div class="flex items-start justify-between gap-3">
 <div>
