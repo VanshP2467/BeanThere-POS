@@ -256,14 +256,26 @@
     </h2>
    </div>
    <Separator />
-   <form class="flex flex-col gap-4" on:submit|preventDefault={saveItem}>
+   <form
+    class="flex flex-col gap-4"
+    onsubmit={(event) => {
+     event.preventDefault();
+     saveItem();
+    }}
+   >
     <div class="space-y-2">
-     <label class="text-sm font-medium">Name</label>
-     <Input placeholder="Vanilla latte" bind:value={name} disabled={isSaving} />
+     <label class="text-sm font-medium" for="menu-item-name">Name</label>
+     <Input
+      id="menu-item-name"
+      placeholder="Vanilla latte"
+      bind:value={name}
+      disabled={isSaving}
+     />
     </div>
     <div class="space-y-2">
-     <label class="text-sm font-medium">Description</label>
+     <label class="text-sm font-medium" for="menu-item-description">Description</label>
      <textarea
+      id="menu-item-description"
       class="border-input bg-background ring-offset-background placeholder:text-muted-foreground shadow-xs min-h-[96px] w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
       placeholder="Add a short description"
       bind:value={description}
@@ -272,8 +284,9 @@
     </div>
     <div class="grid gap-4 sm:grid-cols-2">
      <div class="space-y-2">
-      <label class="text-sm font-medium">Price</label>
+      <label class="text-sm font-medium" for="menu-item-price">Price</label>
       <Input
+       id="menu-item-price"
        type="number"
        min="0"
        step="0.01"
@@ -283,8 +296,9 @@
       />
      </div>
      <div class="space-y-2">
-      <label class="text-sm font-medium">Category</label>
+      <label class="text-sm font-medium" for="menu-item-category">Category</label>
       <select
+       id="menu-item-category"
        class="border-input bg-background ring-offset-background placeholder:text-muted-foreground shadow-xs flex h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
        bind:value={categoryId}
        disabled={isSaving || categories.length === 0}
@@ -302,8 +316,9 @@
      </div>
     </div>
     <div class="space-y-2">
-     <label class="text-sm font-medium">Tags</label>
+     <label class="text-sm font-medium" for="menu-item-tags">Tags</label>
      <Input
+      id="menu-item-tags"
       placeholder="cold, seasonal, oat milk"
       bind:value={tagsInput}
       disabled={isSaving}
