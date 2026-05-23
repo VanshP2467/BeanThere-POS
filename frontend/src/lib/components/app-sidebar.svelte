@@ -16,12 +16,12 @@
   },
   {
    title: "Menu",
-   url: "#",
+   url: "/menu",
    icon: MenuSquareIcon,
   },
   {
    title: "New Order",
-   url: "#",
+   url: "/",
    icon: SquarePlusIcon,
   },
   {
