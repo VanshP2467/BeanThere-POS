@@ -3,26 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from backend.src import models, schema
-
-
-def _get_order(db: Session, order_id: int) -> models.Order:
-    order = db.query(models.Order).filter(models.Order.id == order_id).first()
-    if not order:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Order with id {order_id} not found",
-        )
-    return order
-
-
-def _get_menu_item(db: Session, item_id: int) -> models.MenuItem:
-    menu_item = db.query(models.MenuItem).filter(models.MenuItem.id == item_id).first()
-    if not menu_item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Menu item with id {item_id} not found",
-        )
-    return menu_item
+from backend.src.crud.helpers import get_menu_item_or_404, get_order_or_404
 
 
 def get_order_items(db: Session, order_id: int | None = None):
@@ -53,8 +34,8 @@ def get_order_item(order_item_id: int, db: Session):
 
 
 def create_order_item(db: Session, item: schema.OrderItemStandaloneCreate):
-    _get_order(db, item.order_id)
-    _get_menu_item(db, item.item_id)
+    get_order_or_404(db, item.order_id)
+    get_menu_item_or_404(db, item.item_id)
     db_item = models.OrderItem(
         order_id=item.order_id,
         item_id=item.item_id,
@@ -83,7 +64,7 @@ def update_order_item(
         return db_item
 
     if "item_id" in update_data and update_data["item_id"] is not None:
-        _get_menu_item(db, update_data["item_id"])
+        get_menu_item_or_404(db, update_data["item_id"])
 
     for key, value in update_data.items():
         setattr(db_item, key, value)

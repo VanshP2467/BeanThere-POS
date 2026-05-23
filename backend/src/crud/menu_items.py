@@ -15,7 +15,9 @@ def _get_category(db: Session, category_id: int) -> models.Category:
     return category
 
 
-def _get_modifiers(db: Session, modifier_ids: list[int]) -> list[models.Modifier]:
+def _get_modifiers(
+    db: Session, modifier_ids: list[int] | None
+) -> list[models.Modifier]:
     if not modifier_ids:
         return []
     modifiers = (
