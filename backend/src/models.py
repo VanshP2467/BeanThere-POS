@@ -110,4 +110,5 @@ class OrderItem(Base):
     order: Mapped["Order"] = relationship(
         back_populates="items",
     )
+    item: Mapped["MenuItem"] = relationship("MenuItem")
     quantity: Mapped[int] = mapped_column(Integer, default=1)

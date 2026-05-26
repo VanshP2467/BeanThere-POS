@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "mode-watcher": "^1.1.0",
     "svelte-hamburgers": "^5.0.0"
   }
 }

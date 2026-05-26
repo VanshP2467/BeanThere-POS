@@ -4,7 +4,7 @@ from sqlalchemy.orm import (
     DeclarativeBase,
 )
 
-# SQLite file in the backend folder
+# PostgreSQL database connection
 DATABASE_URL = "postgresql+psycopg2://bean:coffee@localhost:5432/beanthere_pos"
 
 engine = create_engine(DATABASE_URL, echo=False)

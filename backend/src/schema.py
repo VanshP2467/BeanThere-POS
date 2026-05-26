@@ -1,115 +1,137 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # Categories
 
 
-class CategorySchema(BaseModel):
+class CategoryBase(BaseModel):
     name: str
 
 
-class CategoryCreate(CategorySchema):
+class CategoryCreate(CategoryBase):
     pass
 
 
-class CategoryRead(CategorySchema):
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+
+
+class CategoryRead(CategoryBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
-## Modifiers
+# Modifiers
 
 
-class ModifierSchema(BaseModel):
+class ModifierBase(BaseModel):
     name: str
     price_change: float = 0.0
 
 
-class ModifierCreate(ModifierSchema):
+class ModifierCreate(ModifierBase):
     pass
 
 
-class ModifierRead(ModifierSchema):
+class ModifierUpdate(BaseModel):
+    name: Optional[str] = None
+    price_change: Optional[float] = None
+
+
+class ModifierRead(ModifierBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
-# MenuItems
+# Menu Items
 
 
-class MenuItemSchema(BaseModel):
-    id: Optional[int]
+class MenuItemBase(BaseModel):
     name: str
-    description: Optional[str]
+    description: Optional[str] = None
     price: float
-    tags: Optional[List[str]] = []
+    tags: list[str] = Field(default_factory=list)
     active: bool = True
-    modifiers: Optional[List[int]] = []
-    category_id: Optional[int]
-
-    class Config:
-        from_attributes = True
+    category_id: Optional[int] = None
 
 
-class MenuItemCreate(MenuItemSchema):
+class MenuItemCreate(MenuItemBase):
     category_id: int
-    modifier_ids: Optional[List[int]] = []
-
-
-class MenuItemRead(MenuItemSchema):
-    id: int
-    category: Optional[CategoryRead]
-    modifiers: Optional[List[ModifierRead]] = []
-
-    class Config:
-        from_attributes = True
+    modifier_ids: list[int] = Field(default_factory=list)
 
 
 class MenuItemUpdate(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    price: Optional[float]
-    active: Optional[bool]
-    tags: Optional[List[str]]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    active: Optional[bool] = None
+    tags: Optional[list[str]] = None
+    category_id: Optional[int] = None
+    modifier_ids: Optional[list[int]] = None
 
 
-class OrderItemSchema(BaseModel):
+class MenuItemRead(MenuItemBase):
+    id: int
+    category_id: Optional[int] = None
+    category: Optional[CategoryRead] = None
+    modifiers: list[ModifierRead] = Field(default_factory=list)
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Order Items
+
+
+class OrderItemBase(BaseModel):
     item_id: int
     quantity: int = 1
     modifiers: Optional[str] = None
 
 
-class OrderItemCreate(OrderItemSchema):
+class OrderItemCreate(OrderItemBase):
     pass
 
 
-class OrderItemRead(OrderItemSchema):
+class OrderItemStandaloneCreate(OrderItemBase):
+    order_id: int
+
+
+class OrderItemUpdate(BaseModel):
+    item_id: Optional[int] = None
+    quantity: Optional[int] = None
+    modifiers: Optional[str] = None
+
+
+class OrderItemRead(OrderItemBase):
     id: int
-    item: Optional[MenuItemRead]
+    item: Optional[MenuItemRead] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
-class OrderSchema(BaseModel):
+# Orders
+
+
+class OrderBase(BaseModel):
     status: str = "pending"
 
 
-class OrderCreate(OrderSchema):
-    items: List[OrderItemCreate]
+class OrderCreate(OrderBase):
+    items: list[OrderItemCreate] = Field(default_factory=list)
 
 
-class OrderRead(OrderSchema):
+class OrderUpdate(BaseModel):
+    status: Optional[str] = None
+
+
+class OrderRead(OrderBase):
     id: int
     timestamp: datetime
-    items: List[OrderItemRead] = []
+    items: list[OrderItemRead] = Field(default_factory=list)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
